@@ -1,0 +1,1722 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>nobinobi 2026 2日間まとめ | Geminiブース</title>
+  <script>
+    /* ==========================================================================
+       【設定】API & Googleスプレッドシート URL
+       ==========================================================================
+       ・API_URL: Apps Script のウェブアプリURL（初期値: 'YOUR_API_URL'）
+         例: 'https://script.google.com/macros/s/.../exec'
+       ・SHEET_URL: 元のスプレッドシートURL（初期値: 'YOUR_SHEET_URL'）
+         例: 'https://docs.google.com/spreadsheets/d/1i6xjUelHjx4OlTuWkj2XCNWXObsN9mY61GgQM5nZLSI/edit'
+       ========================================================================== */
+    const API_URL = 'YOUR_API_URL';
+    const SHEET_URL = 'YOUR_SHEET_URL';
+  </script>
+  <style>
+    /* ==========================================================================
+       CSS Variables & Reset
+       ========================================================================== */
+    :root {
+      --primary: #2d6a4f;
+      --primary-light: #40916c;
+      --primary-dark: #1b4332;
+      --primary-bg: #d8f3dc;
+      --secondary: #b7e4c7;
+      --accent: #e76f51;
+      --accent-good: #2a9d8f;
+      --accent-good-bg: #e8f5e9;
+      --accent-bad: #e76f51;
+      --accent-bad-bg: #fbe9e7;
+      
+      --day1-color: #2d6a4f;
+      --day1-bg: #d8f3dc;
+      --day2-color: #028090;
+      --day2-bg: #e0f2f1;
+
+      --bg-color: #f7faf7;
+      --card-bg: #ffffff;
+      --text-main: #1f2937;
+      --text-sub: #4b5563;
+      --text-muted: #6b7280;
+      --border-color: #e5e7eb;
+      --border-radius-sm: 8px;
+      --border-radius: 14px;
+      --border-radius-lg: 20px;
+      --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.05);
+      --shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+      --shadow-lg: 0 10px 25px -5px rgba(45, 106, 79, 0.12);
+      
+      --font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Yu Gothic", Meiryo, sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: var(--font-family);
+      background-color: var(--bg-color);
+      color: var(--text-main);
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+      padding-bottom: 60px;
+    }
+
+    /* Container */
+    .container {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 16px;
+    }
+
+    /* ==========================================================================
+       Header
+       ========================================================================== */
+    .header {
+      background: linear-gradient(135deg, #1b4332 0%, #2d6a4f 60%, #40916c 100%);
+      color: #ffffff;
+      padding: 32px 20px 28px;
+      border-radius: 0 0 var(--border-radius-lg) var(--border-radius-lg);
+      box-shadow: var(--shadow-lg);
+      margin-bottom: 24px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .header::before {
+      content: "";
+      position: absolute;
+      top: -40px;
+      right: -40px;
+      width: 140px;
+      height: 140px;
+      background: radial-gradient(circle, rgba(255,255,255,0.15) 0%, rgba(255,255,255,0) 70%);
+      border-radius: 50%;
+    }
+
+    .header-badge {
+      display: inline-block;
+      background-color: rgba(255, 255, 255, 0.2);
+      backdrop-filter: blur(4px);
+      padding: 4px 14px;
+      border-radius: 999px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      margin-bottom: 12px;
+    }
+
+    .header-title {
+      font-size: 1.85rem;
+      font-weight: 800;
+      line-height: 1.3;
+      margin-bottom: 10px;
+      letter-spacing: -0.02em;
+    }
+
+    .header-meta {
+      font-size: 0.92rem;
+      opacity: 0.95;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      align-items: center;
+    }
+
+    .api-status-banner {
+      display: none;
+      margin-top: 14px;
+      padding: 6px 14px;
+      border-radius: 999px;
+      font-size: 0.78rem;
+      font-weight: 600;
+      background: rgba(255, 255, 255, 0.25);
+    }
+    .api-status-banner.visible {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    /* ==========================================================================
+       Cards & Sections
+       ========================================================================== */
+    .section-card {
+      background: var(--card-bg);
+      border-radius: var(--border-radius);
+      padding: 22px 18px;
+      margin-bottom: 22px;
+      box-shadow: var(--shadow);
+      border: 1px solid var(--border-color);
+    }
+
+    .section-title-wrap {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 18px;
+      padding-bottom: 10px;
+      border-bottom: 2px solid var(--primary-bg);
+    }
+
+    .section-title {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--primary-dark);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .section-badge {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      background: #f3f4f6;
+      padding: 3px 8px;
+      border-radius: 6px;
+    }
+
+    /* ==========================================================================
+       Primary Highlight Card
+       ========================================================================== */
+    .highlight-card {
+      background: linear-gradient(135deg, #f0fdf4 0%, #e8f5e9 100%);
+      border: 2px solid #81c784;
+      border-radius: var(--border-radius);
+      padding: 22px 18px;
+      text-align: center;
+      margin-bottom: 20px;
+      box-shadow: 0 4px 14px rgba(45, 106, 79, 0.08);
+    }
+
+    .highlight-label {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: var(--primary-dark);
+      margin-bottom: 4px;
+    }
+
+    .highlight-num {
+      font-size: 3rem;
+      font-weight: 900;
+      color: var(--primary);
+      line-height: 1.1;
+      letter-spacing: -0.03em;
+    }
+
+    .highlight-unit {
+      font-size: 1.1rem;
+      font-weight: 600;
+      margin-left: 4px;
+      color: var(--text-sub);
+    }
+
+    .highlight-breakdown {
+      display: flex;
+      justify-content: center;
+      gap: 16px;
+      margin-top: 14px;
+      padding-top: 12px;
+      border-top: 1px dashed #a5d6a7;
+    }
+
+    .breakdown-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .breakdown-badge {
+      font-size: 0.75rem;
+      font-weight: 700;
+      padding: 2px 10px;
+      border-radius: 999px;
+      margin-bottom: 4px;
+    }
+
+    .badge-day1 {
+      background: var(--day1-bg);
+      color: var(--day1-color);
+    }
+
+    .badge-day2 {
+      background: var(--day2-bg);
+      color: var(--day2-color);
+    }
+
+    .breakdown-val {
+      font-size: 1.35rem;
+      font-weight: 800;
+      color: var(--text-main);
+    }
+
+    /* Sub KPI Cards Grid */
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    @media (min-width: 640px) {
+      .kpi-grid {
+        grid-template-columns: repeat(4, 1fr);
+      }
+    }
+
+    .kpi-card {
+      background: #ffffff;
+      border: 1px solid var(--border-color);
+      border-radius: var(--border-radius-sm);
+      padding: 14px 12px;
+      text-align: center;
+      transition: transform 0.15s ease, box-shadow 0.15s ease;
+    }
+
+    .kpi-card:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .kpi-title {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      font-weight: 600;
+      margin-bottom: 6px;
+    }
+
+    .kpi-val {
+      font-size: 1.5rem;
+      font-weight: 800;
+      color: var(--text-main);
+      line-height: 1.2;
+    }
+
+    .kpi-sub {
+      font-size: 0.72rem;
+      color: var(--text-sub);
+      margin-top: 4px;
+    }
+
+    /* Summary Table */
+    .table-container {
+      width: 100%;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      margin-top: 14px;
+      border-radius: var(--border-radius-sm);
+      border: 1px solid var(--border-color);
+    }
+
+    .summary-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.88rem;
+      text-align: left;
+    }
+
+    .summary-table th, .summary-table td {
+      padding: 10px 12px;
+      border-bottom: 1px solid var(--border-color);
+      white-space: nowrap;
+    }
+
+    .summary-table th {
+      background-color: #f8fafc;
+      font-weight: 700;
+      color: var(--text-sub);
+    }
+
+    .summary-table tr:last-child td {
+      border-bottom: none;
+    }
+
+    .summary-table tr:hover {
+      background-color: #fbfdfb;
+    }
+
+    .summary-table td.num {
+      text-align: right;
+      font-variant-numeric: tabular-nums;
+      font-weight: 600;
+    }
+
+    .summary-table td.total-num {
+      font-weight: 800;
+      color: var(--primary-dark);
+    }
+
+    .note-text {
+      font-size: 0.75rem;
+      color: #b45309;
+      background: #fef3c7;
+      padding: 2px 6px;
+      border-radius: 4px;
+      display: inline-block;
+      max-width: 200px;
+      white-space: normal;
+    }
+
+    /* ==========================================================================
+       Hourly Graph (Pure CSS Bar Chart)
+       ========================================================================== */
+    .chart-legend {
+      display: flex;
+      gap: 16px;
+      margin-bottom: 16px;
+      font-size: 0.84rem;
+      font-weight: 600;
+      align-items: center;
+    }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .legend-color {
+      width: 14px;
+      height: 14px;
+      border-radius: 4px;
+    }
+
+    .color-day1 {
+      background-color: var(--day1-color);
+    }
+
+    .color-day2 {
+      background-color: var(--day2-color);
+    }
+
+    .hourly-chart-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .hourly-row {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .hourly-time-header {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.78rem;
+      font-weight: 700;
+      color: var(--text-sub);
+    }
+
+    .hourly-bars-group {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      background: #f8fafc;
+      padding: 6px 8px;
+      border-radius: 8px;
+    }
+
+    .bar-line {
+      display: flex;
+      align-items: center;
+      height: 22px;
+      position: relative;
+    }
+
+    .bar-label {
+      width: 44px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+
+    .bar-track {
+      flex: 1;
+      height: 14px;
+      background-color: #e2e8f0;
+      border-radius: 999px;
+      overflow: hidden;
+      position: relative;
+      margin: 0 8px;
+    }
+
+    .bar-fill {
+      height: 100%;
+      border-radius: 999px;
+      transition: width 0.4s ease-out;
+    }
+
+    .bar-fill-day1 {
+      background: linear-gradient(90deg, #40916c, #2d6a4f);
+    }
+
+    .bar-fill-day2 {
+      background: linear-gradient(90deg, #26c6da, #028090);
+    }
+
+    .bar-val {
+      font-size: 0.8rem;
+      font-weight: 700;
+      width: 38px;
+      text-align: right;
+      flex-shrink: 0;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .peak-tag {
+      background: #fef08a;
+      color: #854d0e;
+      font-size: 0.65rem;
+      font-weight: 700;
+      padding: 1px 5px;
+      border-radius: 4px;
+      margin-left: 4px;
+    }
+
+    /* ==========================================================================
+       Staff Ranking Section
+       ========================================================================== */
+    .staff-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 16px;
+    }
+
+    @media (min-width: 640px) {
+      .staff-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
+    .staff-col {
+      background: #fafcfb;
+      border: 1px solid var(--border-color);
+      border-radius: var(--border-radius-sm);
+      padding: 14px;
+    }
+
+    .staff-col-header {
+      font-size: 0.95rem;
+      font-weight: 700;
+      padding-bottom: 8px;
+      margin-bottom: 10px;
+      border-bottom: 2px solid;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .staff-col-day1 .staff-col-header {
+      border-color: var(--day1-color);
+      color: var(--day1-color);
+    }
+
+    .staff-col-day2 .staff-col-header {
+      border-color: var(--day2-color);
+      color: var(--day2-color);
+    }
+
+    .staff-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .staff-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 8px 12px;
+      background: #ffffff;
+      border: 1px solid #edf2f7;
+      border-radius: 8px;
+      font-size: 0.9rem;
+    }
+
+    .staff-name-wrap {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: 600;
+    }
+
+    .staff-rank {
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      background: #f1f5f9;
+      color: var(--text-sub);
+      font-size: 0.72rem;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .staff-rank.top-1 {
+      background: #fef08a;
+      color: #854d0e;
+    }
+
+    .staff-count {
+      font-weight: 800;
+      font-size: 1.05rem;
+      color: var(--text-main);
+      font-variant-numeric: tabular-nums;
+    }
+
+    .staff-count small {
+      font-size: 0.75rem;
+      font-weight: 500;
+      color: var(--text-muted);
+      margin-left: 2px;
+    }
+
+    /* ==========================================================================
+       Comments Section
+       ========================================================================== */
+    .day-tabs {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 18px;
+      background: #edf2f7;
+      padding: 4px;
+      border-radius: 12px;
+    }
+
+    .day-tab-btn {
+      flex: 1;
+      padding: 10px 12px;
+      border: none;
+      background: transparent;
+      border-radius: 9px;
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: var(--text-sub);
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+
+    .day-tab-btn.active {
+      background: #ffffff;
+      color: var(--primary-dark);
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+    }
+
+    .day-content-panel {
+      display: none;
+    }
+
+    .day-content-panel.active {
+      display: block;
+    }
+
+    .feedback-group {
+      margin-bottom: 24px;
+      background: #ffffff;
+      border-radius: var(--border-radius);
+      border: 1px solid var(--border-color);
+      overflow: hidden;
+    }
+
+    .feedback-group.good {
+      border-top: 4px solid var(--accent-good);
+    }
+
+    .feedback-group.bad {
+      border-top: 4px solid var(--accent-bad);
+    }
+
+    .feedback-header {
+      padding: 12px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .feedback-group.good .feedback-header {
+      background-color: var(--accent-good-bg);
+    }
+
+    .feedback-group.bad .feedback-header {
+      background-color: var(--accent-bad-bg);
+    }
+
+    .feedback-title {
+      font-size: 1.05rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .feedback-group.good .feedback-title {
+      color: #1b4d3e;
+    }
+
+    .feedback-group.bad .feedback-title {
+      color: #9c2710;
+    }
+
+    .comment-count-pill {
+      font-size: 0.75rem;
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.8);
+      color: var(--text-sub);
+    }
+
+    /* Comment Form */
+    .comment-form-wrap {
+      padding: 14px 16px;
+      background: #fafafa;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .form-group {
+      margin-bottom: 10px;
+    }
+
+    .form-label {
+      display: block;
+      font-size: 0.78rem;
+      font-weight: 700;
+      color: var(--text-sub);
+      margin-bottom: 4px;
+    }
+
+    .input-text, .textarea-text {
+      width: 100%;
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+      padding: 10px 12px;
+      font-family: inherit;
+      font-size: 16px; /* iOS zoom prevention */
+      color: var(--text-main);
+      background: #ffffff;
+      transition: border-color 0.15s ease, box-shadow 0.15s ease;
+    }
+
+    .input-text:focus, .textarea-text:focus {
+      outline: none;
+      border-color: var(--primary-light);
+      box-shadow: 0 0 0 3px rgba(64, 145, 108, 0.15);
+    }
+
+    .textarea-text {
+      resize: vertical;
+      min-height: 70px;
+      line-height: 1.4;
+    }
+
+    .form-submit-row {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 12px;
+    }
+
+    .btn-submit {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 8px;
+      font-size: 0.92rem;
+      font-weight: 700;
+      color: #ffffff;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: filter 0.15s ease, transform 0.1s ease;
+      touch-action: manipulation;
+    }
+
+    .btn-submit:active {
+      transform: scale(0.98);
+    }
+
+    .btn-submit:disabled {
+      opacity: 0.55;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .btn-good {
+      background-color: var(--accent-good);
+    }
+
+    .btn-good:hover:not(:disabled) {
+      filter: brightness(0.92);
+    }
+
+    .btn-bad {
+      background-color: var(--accent-bad);
+    }
+
+    .btn-bad:hover:not(:disabled) {
+      filter: brightness(0.92);
+    }
+
+    .form-error {
+      display: none;
+      color: #dc2626;
+      font-size: 0.8rem;
+      font-weight: 600;
+      margin-top: 6px;
+      padding: 6px 10px;
+      background: #fef2f2;
+      border-radius: 6px;
+      border-left: 3px solid #dc2626;
+    }
+
+    /* Comment List */
+    .comments-list {
+      padding: 12px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      max-height: 480px;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .comment-item {
+      background: #ffffff;
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      padding: 12px 14px;
+      position: relative;
+    }
+
+    .comment-meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      margin-bottom: 6px;
+    }
+
+    .comment-author {
+      font-weight: 700;
+      color: var(--text-main);
+    }
+
+    .comment-time {
+      font-size: 0.75rem;
+    }
+
+    .comment-text {
+      font-size: 0.92rem;
+      color: var(--text-main);
+      white-space: pre-wrap;
+      word-break: break-word;
+      line-height: 1.5;
+    }
+
+    .empty-comments {
+      text-align: center;
+      padding: 24px 12px;
+      color: var(--text-muted);
+      font-size: 0.85rem;
+    }
+
+    .reload-comments-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      background: #edf2f7;
+      border: 1px solid #cbd5e1;
+      padding: 6px 12px;
+      border-radius: 6px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      cursor: pointer;
+      color: var(--text-sub);
+      margin-top: 8px;
+    }
+
+    .reload-comments-btn:hover {
+      background: #e2e8f0;
+    }
+
+    /* ==========================================================================
+       Footer
+       ========================================================================== */
+    .footer {
+      text-align: center;
+      margin-top: 36px;
+      padding: 24px 16px;
+      color: var(--text-sub);
+      font-size: 0.85rem;
+    }
+
+    .sheet-link-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: #ffffff;
+      color: var(--primary-dark);
+      border: 1.5px solid var(--primary);
+      padding: 10px 22px;
+      border-radius: 999px;
+      font-size: 0.92rem;
+      font-weight: 700;
+      text-decoration: none;
+      margin-bottom: 12px;
+      transition: all 0.15s ease;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .sheet-link-btn:hover {
+      background: var(--primary-bg);
+      transform: translateY(-1px);
+      box-shadow: var(--shadow);
+    }
+
+    /* ==========================================================================
+       Loading / Toast Notification
+       ========================================================================== */
+    .toast-container {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      left: 20px;
+      display: flex;
+      justify-content: center;
+      pointer-events: none;
+      z-index: 999;
+    }
+
+    .toast {
+      background: rgba(31, 41, 55, 0.95);
+      color: #ffffff;
+      padding: 10px 18px;
+      border-radius: 999px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+      opacity: 0;
+      transform: translateY(20px);
+      transition: all 0.25s ease;
+      pointer-events: auto;
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Header -->
+  <header class="header">
+    <div class="header-badge">Geminiブース「親子の『やってみたい』作戦会議」</div>
+    <h1 class="header-title">nobinobi 2026 2日間まとめ</h1>
+    <div class="header-meta">
+      <div>🗓️ 2026年11月7日(土) 〜 8日(日)</div>
+      <div>📍 長井海の手公園ソレイユの丘</div>
+    </div>
+    <div id="api-status-banner" class="api-status-banner">
+      <span id="api-status-text">データ読み込み中…</span>
+    </div>
+  </header>
+
+  <main class="container">
+
+    <!-- 1. 数字サマリ Section -->
+    <section class="section-card">
+      <div class="section-title-wrap">
+        <h2 class="section-title">📊 数字サマリ</h2>
+        <span class="section-badge">確定値</span>
+      </div>
+
+      <!-- メインハイライト -->
+      <div class="highlight-card">
+        <div class="highlight-label">2日間合計カウント（確定）</div>
+        <div>
+          <span class="highlight-num" id="total-count-val">1,271</span>
+          <span class="highlight-unit">件</span>
+        </div>
+        <div class="highlight-breakdown">
+          <div class="breakdown-item">
+            <span class="breakdown-badge badge-day1">Day 1（11/7）</span>
+            <span class="breakdown-val" id="day1-count-val">707</span>
+          </div>
+          <div class="breakdown-item">
+            <span class="breakdown-badge badge-day2">Day 2（11/8）</span>
+            <span class="breakdown-val" id="day2-count-val">564</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 主要KPIカード群 -->
+      <div class="kpi-grid">
+        <div class="kpi-card">
+          <div class="kpi-title">👥 来場者数</div>
+          <div class="kpi-val" id="kpi-visitors">698</div>
+          <div class="kpi-sub">Day1: 387 / Day2: 311</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-title">✨ 体験数</div>
+          <div class="kpi-val" id="kpi-experience">328</div>
+          <div class="kpi-sub">Day1: 181 / Day2: 147</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-title">📲 Gemini DL</div>
+          <div class="kpi-val" id="kpi-dl">245</div>
+          <div class="kpi-sub">Day1: 139 / Day2: 106</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-title">⚡ ピーク時</div>
+          <div class="kpi-val" style="font-size: 1.15rem; padding-top: 4px;">147<small style="font-size:0.75rem;font-weight:600;">件/30分</small></div>
+          <div class="kpi-sub">Day2 15:00 (Day1 10:30=84)</div>
+        </div>
+      </div>
+
+      <!-- 全項目テーブル -->
+      <div class="table-container">
+        <table class="summary-table">
+          <thead>
+            <tr>
+              <th>項目</th>
+              <th style="text-align: right;">1日目</th>
+              <th style="text-align: right;">2日目</th>
+              <th style="text-align: right;">2日間合計</th>
+              <th>備考・注意書き</th>
+            </tr>
+          </thead>
+          <tbody id="summary-table-body">
+            <!-- JavaScriptで描画 -->
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- 2. 時間帯別グラフ Section -->
+    <section class="section-card">
+      <div class="section-title-wrap">
+        <h2 class="section-title">⏱️ 時間帯別カウント</h2>
+        <span class="section-badge">30分単位</span>
+      </div>
+
+      <div class="chart-legend">
+        <div class="legend-item">
+          <span class="legend-color color-day1"></span>
+          <span>1日目（11/7）</span>
+        </div>
+        <div class="legend-item">
+          <span class="legend-color color-day2"></span>
+          <span>2日目（11/8）</span>
+        </div>
+      </div>
+
+      <div id="hourly-chart-list" class="hourly-chart-list">
+        <!-- JavaScriptで描画 -->
+      </div>
+    </section>
+
+    <!-- 3. スタッフ別 Section -->
+    <section class="section-card">
+      <div class="section-title-wrap">
+        <h2 class="section-title">🙌 スタッフ別カウント</h2>
+        <span class="section-badge">担当日別</span>
+      </div>
+
+      <div class="staff-grid">
+        <!-- 1日目 -->
+        <div class="staff-col staff-col-day1">
+          <div class="staff-col-header">
+            <span>🌿 1日目（11/7）</span>
+            <span id="staff-day1-total" style="font-size: 0.8rem; font-weight: 600;">計 707</span>
+          </div>
+          <ul id="staff-day1-list" class="staff-list">
+            <!-- JavaScriptで描画 -->
+          </ul>
+        </div>
+
+        <!-- 2日目 -->
+        <div class="staff-col staff-col-day2">
+          <div class="staff-col-header">
+            <span>🌊 2日目（11/8）</span>
+            <span id="staff-day2-total" style="font-size: 0.8rem; font-weight: 600;">計 564</span>
+          </div>
+          <ul id="staff-day2-list" class="staff-list">
+            <!-- JavaScriptで描画 -->
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- 4. コメント欄 Section -->
+    <section class="section-card" id="comments-section">
+      <div class="section-title-wrap">
+        <h2 class="section-title">💬 振り返りコメント</h2>
+        <span class="section-badge">Good &amp; Bad</span>
+      </div>
+
+      <!-- 日程切り替えタブ -->
+      <div class="day-tabs">
+        <button type="button" class="day-tab-btn active" data-day="day1" onclick="switchDayTab('day1')">
+          🌿 1日目（11/7）
+        </button>
+        <button type="button" class="day-tab-btn" data-day="day2" onclick="switchDayTab('day2')">
+          🌊 2日目（11/8）
+        </button>
+      </div>
+
+      <!-- Day 1 Panel -->
+      <div id="panel-day1" class="day-content-panel active">
+        <!-- Good -->
+        <div class="feedback-group good">
+          <div class="feedback-header">
+            <div class="feedback-title">
+              <span>👍 良かった点</span>
+            </div>
+            <span class="comment-count-pill" id="count-day1-good">0件</span>
+          </div>
+          
+          <div class="comment-form-wrap">
+            <form onsubmit="handleCommentSubmit(event, 'day1', 'good')">
+              <div class="form-group">
+                <label class="form-label">お名前（任意）</label>
+                <input type="text" class="input-text" name="name" placeholder="無記名（空欄可）">
+              </div>
+              <div class="form-group">
+                <label class="form-label">良かった点・嬉しかったこと <span style="color:#dc2626;">*</span></label>
+                <textarea class="textarea-text" name="text" placeholder="例: 親子の反応がとても良く、Geminiの案内がスムーズだった" required></textarea>
+              </div>
+              <div class="form-error" id="error-day1-good"></div>
+              <div class="form-submit-row">
+                <button type="submit" class="btn-submit btn-good" id="btn-day1-good">
+                  <span>投稿する</span>
+                </button>
+              </div>
+            </form>
+          </div>
+
+          <div class="comments-list" id="list-day1-good">
+            <!-- コメント一覧 -->
+          </div>
+        </div>
+
+        <!-- Bad / Improvement -->
+        <div class="feedback-group bad">
+          <div class="feedback-header">
+            <div class="feedback-title">
+              <span>👎 悪かった点・改善点</span>
+            </div>
+            <span class="comment-count-pill" id="count-day1-bad">0件</span>
+          </div>
+
+          <div class="comment-form-wrap">
+            <form onsubmit="handleCommentSubmit(event, 'day1', 'bad')">
+              <div class="form-group">
+                <label class="form-label">お名前（任意）</label>
+                <input type="text" class="input-text" name="name" placeholder="無記名（空欄可）">
+              </div>
+              <div class="form-group">
+                <label class="form-label">気になった点・次回への改善点 <span style="color:#dc2626;">*</span></label>
+                <textarea class="textarea-text" name="text" placeholder="例: 午前中のピーク時に列の整理が必要だった" required></textarea>
+              </div>
+              <div class="form-error" id="error-day1-bad"></div>
+              <div class="form-submit-row">
+                <button type="submit" class="btn-submit btn-bad" id="btn-day1-bad">
+                  <span>投稿する</span>
+                </button>
+              </div>
+            </form>
+          </div>
+
+          <div class="comments-list" id="list-day1-bad">
+            <!-- コメント一覧 -->
+          </div>
+        </div>
+      </div>
+
+      <!-- Day 2 Panel -->
+      <div id="panel-day2" class="day-content-panel">
+        <!-- Good -->
+        <div class="feedback-group good">
+          <div class="feedback-header">
+            <div class="feedback-title">
+              <span>👍 良かった点</span>
+            </div>
+            <span class="comment-count-pill" id="count-day2-good">0件</span>
+          </div>
+
+          <div class="comment-form-wrap">
+            <form onsubmit="handleCommentSubmit(event, 'day2', 'good')">
+              <div class="form-group">
+                <label class="form-label">お名前（任意）</label>
+                <input type="text" class="input-text" name="name" placeholder="無記名（空欄可）">
+              </div>
+              <div class="form-group">
+                <label class="form-label">良かった点・嬉しかったこと <span style="color:#dc2626;">*</span></label>
+                <textarea class="textarea-text" name="text" placeholder="例: 午後の混雑時もチームワークで乗り切れた" required></textarea>
+              </div>
+              <div class="form-error" id="error-day2-good"></div>
+              <div class="form-submit-row">
+                <button type="submit" class="btn-submit btn-good" id="btn-day2-good">
+                  <span>投稿する</span>
+                </button>
+              </div>
+            </form>
+          </div>
+
+          <div class="comments-list" id="list-day2-good">
+            <!-- コメント一覧 -->
+          </div>
+        </div>
+
+        <!-- Bad / Improvement -->
+        <div class="feedback-group bad">
+          <div class="feedback-header">
+            <div class="feedback-title">
+              <span>👎 悪かった点・改善点</span>
+            </div>
+            <span class="comment-count-pill" id="count-day2-bad">0件</span>
+          </div>
+
+          <div class="comment-form-wrap">
+            <form onsubmit="handleCommentSubmit(event, 'day2', 'bad')">
+              <div class="form-group">
+                <label class="form-label">お名前（任意）</label>
+                <input type="text" class="input-text" name="name" placeholder="無記名（空欄可）">
+              </div>
+              <div class="form-group">
+                <label class="form-label">気になった点・次回への改善点 <span style="color:#dc2626;">*</span></label>
+                <textarea class="textarea-text" name="text" placeholder="例: 15時の突発的なピークに対応できるよう配置を見直したい" required></textarea>
+              </div>
+              <div class="form-error" id="error-day2-bad"></div>
+              <div class="form-submit-row">
+                <button type="submit" class="btn-submit btn-bad" id="btn-day2-bad">
+                  <span>投稿する</span>
+                </button>
+              </div>
+            </form>
+          </div>
+
+          <div class="comments-list" id="list-day2-bad">
+            <!-- コメント一覧 -->
+          </div>
+        </div>
+      </div>
+
+    </section>
+
+  </main>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div>
+      <a id="sheet-link" href="#" target="_blank" rel="noopener noreferrer" class="sheet-link-btn">
+        <span>📊 スプレッドシート本体を開く</span>
+      </a>
+    </div>
+    <p>nobinobi 2026 Gemini ブース運営チーム</p>
+  </footer>
+
+  <!-- Toast Notification -->
+  <div class="toast-container">
+    <div id="toast" class="toast"></div>
+  </div>
+
+  <!-- JavaScript -->
+  <script>
+    /* ==========================================================================
+       確定フォールバックデータ (GET APIが失敗した場合、またはURL未設定時に利用)
+       ========================================================================== */
+    const FALLBACK_DATA = {
+      numbers: [
+        { "項目": "合計カウント（確定）", "1日目": "707", "2日目": "564", "2日間合計": "1271", "備考": "メイン確定値" },
+        { "項目": "来場者数", "1日目": "387", "2日目": "311", "2日間合計": "698", "備考": "" },
+        { "項目": "体験数", "1日目": "181", "2日目": "147", "2日間合計": "328", "備考": "" },
+        { "項目": "Gemini DL", "1日目": "139", "2日目": "106", "2日間合計": "245", "備考": "" },
+        { "項目": "ピーク時間帯", "1日目": "10:30 (84件)", "2日目": "15:00 (147件)", "2日間合計": "15:00 (147件)", "備考": "1日目は午前、2日目は午後に集中" }
+      ],
+      hourly: [
+        { "時間帯": "10:00", "1日目": "39", "2日目": "67" },
+        { "時間帯": "10:30", "1日目": "84", "2日目": "43" },
+        { "時間帯": "11:00", "1日目": "77", "2日目": "23" },
+        { "時間帯": "11:30", "1日目": "67", "2日目": "16" },
+        { "時間帯": "12:00", "1日目": "49", "2日目": "50" },
+        { "時間帯": "12:30", "1日目": "53", "2日目": "51" },
+        { "時間帯": "13:00", "1日目": "39", "2日目": "19" },
+        { "時間帯": "13:30", "1日目": "31", "2日目": "32" },
+        { "時間帯": "14:00", "1日目": "31", "2日目": "32" },
+        { "時間帯": "14:30", "1日目": "44", "2日目": "19" },
+        { "時間帯": "15:00", "1日目": "19", "2日目": "147" },
+        { "時間帯": "15:30", "1日目": "58", "2日目": "30" },
+        { "時間帯": "16:00", "1日目": "52", "2日目": "13" },
+        { "時間帯": "16:30", "1日目": "40", "2日目": "19" },
+        { "時間帯": "17:00", "1日目": "24", "2日目": "3" }
+      ],
+      staff: [
+        { "日": "1日目", "スタッフ": "泉清子", "カウント": "346" },
+        { "日": "1日目", "スタッフ": "安藤優希", "カウント": "267" },
+        { "日": "1日目", "スタッフ": "凪", "カウント": "94" },
+        { "日": "2日目", "スタッフ": "飯田伶", "カウント": "162" },
+        { "日": "2日目", "スタッフ": "伊藤有里夏", "カウント": "161" },
+        { "日": "2日目", "スタッフ": "泉清子", "カウント": "134" },
+        { "日": "2日目", "スタッフ": "ノア", "カウント": "107" }
+      ],
+      comments: []
+    };
+
+    // アプリ状態
+    let appData = {
+      numbers: [],
+      hourly: [],
+      staff: [],
+      comments: []
+    };
+    let commentsLoaded = false;
+
+    /* ==========================================================================
+       ユーティリティ
+       ========================================================================== */
+    function escapeHtml(str) {
+      if (!str) return '';
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    }
+
+    function formatNumber(val) {
+      if (!val) return '0';
+      const num = Number(String(val).replace(/,/g, ''));
+      return isNaN(num) ? val : num.toLocaleString('ja-JP');
+    }
+
+    function showToast(message) {
+      const toast = document.getElementById('toast');
+      toast.textContent = message;
+      toast.classList.add('show');
+      setTimeout(() => {
+        toast.classList.remove('show');
+      }, 3200);
+    }
+
+    function switchDayTab(day) {
+      document.querySelectorAll('.day-tab-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.day === day);
+      });
+      document.getElementById('panel-day1').classList.toggle('active', day === 'day1');
+      document.getElementById('panel-day2').classList.toggle('active', day === 'day2');
+    }
+
+    /* ==========================================================================
+       描画関数群
+       ========================================================================== */
+
+    // 1. 数字サマリの描画
+    function renderNumbers(numbersList) {
+      if (!numbersList || numbersList.length === 0) return;
+
+      const tbody = document.getElementById('summary-table-body');
+      tbody.innerHTML = '';
+
+      let foundTotal = false;
+
+      numbersList.forEach(item => {
+        const title = item["項目"] || '';
+        const day1 = item["1日目"] || '';
+        const day2 = item["2日目"] || '';
+        const total = item["2日間合計"] || '';
+        const note = item["備考"] || '';
+
+        // メインカードの更新（合計カウント）
+        if (!foundTotal && (title.includes('合計カウント') || title.includes('カウント'))) {
+          document.getElementById('total-count-val').textContent = formatNumber(total);
+          document.getElementById('day1-count-val').textContent = formatNumber(day1);
+          document.getElementById('day2-count-val').textContent = formatNumber(day2);
+          foundTotal = true;
+        }
+
+        // 各KPIカードの更新
+        if (title.includes('来場者')) {
+          document.getElementById('kpi-visitors').textContent = formatNumber(total);
+        } else if (title.includes('体験')) {
+          document.getElementById('kpi-experience').textContent = formatNumber(total);
+        } else if (title.includes('Gemini') || title.includes('DL')) {
+          document.getElementById('kpi-dl').textContent = formatNumber(total);
+        }
+
+        // テーブル行の追加
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td><strong>${escapeHtml(title)}</strong></td>
+          <td class="num">${escapeHtml(day1)}</td>
+          <td class="num">${escapeHtml(day2)}</td>
+          <td class="num total-num">${escapeHtml(total)}</td>
+          <td>${note ? `<span class="note-text">⚠️ ${escapeHtml(note)}</span>` : '<span style="color:#94a3b8;">-</span>'}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    // 2. 時間帯別グラフの描画 (CSS横棒グラフ)
+    function renderHourlyChart(hourlyList) {
+      if (!hourlyList || hourlyList.length === 0) return;
+
+      const container = document.getElementById('hourly-chart-list');
+      container.innerHTML = '';
+
+      // 最大値の算出（パーセントバー用）
+      let maxCount = 0;
+      hourlyList.forEach(item => {
+        const d1 = parseInt(item["1日目"] || 0, 10);
+        const d2 = parseInt(item["2日目"] || 0, 10);
+        if (d1 > maxCount) maxCount = d1;
+        if (d2 > maxCount) maxCount = d2;
+      });
+      if (maxCount === 0) maxCount = 100;
+
+      hourlyList.forEach(item => {
+        const time = item["時間帯"] || '';
+        const d1 = parseInt(item["1日目"] || 0, 10);
+        const d2 = parseInt(item["2日目"] || 0, 10);
+
+        const d1Width = Math.min(100, Math.max(3, (d1 / maxCount) * 100));
+        const d2Width = Math.min(100, Math.max(3, (d2 / maxCount) * 100));
+
+        // ピーク判定
+        const isD1Peak = (d1 >= 80);
+        const isD2Peak = (d2 >= 100);
+
+        const row = document.createElement('div');
+        row.className = 'hourly-row';
+        row.innerHTML = `
+          <div class="hourly-bars-group">
+            <div class="hourly-time-header">
+              <span>🕒 ${escapeHtml(time)}</span>
+              <span>合計: <strong>${d1 + d2}</strong> 件</span>
+            </div>
+            
+            <!-- Day 1 bar -->
+            <div class="bar-line">
+              <span class="bar-label" style="color:var(--day1-color);">1日目</span>
+              <div class="bar-track">
+                <div class="bar-fill bar-fill-day1" style="width: ${d1Width}%;"></div>
+              </div>
+              <span class="bar-val" style="color:var(--day1-color);">
+                ${d1} ${isD1Peak ? '<span class="peak-tag">👑</span>' : ''}
+              </span>
+            </div>
+
+            <!-- Day 2 bar -->
+            <div class="bar-line">
+              <span class="bar-label" style="color:var(--day2-color);">2日目</span>
+              <div class="bar-track">
+                <div class="bar-fill bar-fill-day2" style="width: ${d2Width}%;"></div>
+              </div>
+              <span class="bar-val" style="color:var(--day2-color);">
+                ${d2} ${isD2Peak ? '<span class="peak-tag">👑</span>' : ''}
+              </span>
+            </div>
+          </div>
+        `;
+        container.appendChild(row);
+      });
+    }
+
+    // 3. スタッフ別カウントの描画
+    function renderStaff(staffList) {
+      if (!staffList || staffList.length === 0) return;
+
+      const day1ListEl = document.getElementById('staff-day1-list');
+      const day2ListEl = document.getElementById('staff-day2-list');
+      day1ListEl.innerHTML = '';
+      day2ListEl.innerHTML = '';
+
+      const day1Items = staffList.filter(s => String(s["日"]).includes('1'));
+      const day2Items = staffList.filter(s => String(s["日"]).includes('2'));
+
+      // カウント降順ソート
+      day1Items.sort((a, b) => parseInt(b["カウント"] || 0, 10) - parseInt(a["カウント"] || 0, 10));
+      day2Items.sort((a, b) => parseInt(b["カウント"] || 0, 10) - parseInt(a["カウント"] || 0, 10));
+
+      const renderGroup = (items, targetEl, totalElId) => {
+        let total = 0;
+        items.forEach((item, index) => {
+          const name = item["スタッフ"] || '無名';
+          const count = parseInt(item["カウント"] || 0, 10);
+          total += count;
+
+          const li = document.createElement('li');
+          li.className = 'staff-item';
+          li.innerHTML = `
+            <div class="staff-name-wrap">
+              <span class="staff-rank ${index === 0 ? 'top-1' : ''}">${index + 1}</span>
+              <span>${escapeHtml(name)}</span>
+            </div>
+            <div class="staff-count">${formatNumber(count)}<small>件</small></div>
+          `;
+          targetEl.appendChild(li);
+        });
+        if (total > 0) {
+          document.getElementById(totalElId).textContent = `計 ${formatNumber(total)} 件`;
+        }
+      };
+
+      renderGroup(day1Items, day1ListEl, 'staff-day1-total');
+      renderGroup(day2Items, day2ListEl, 'staff-day2-total');
+    }
+
+    // 4. コメント一覧の描画
+    function renderComments(commentsList, isError = false) {
+      const targets = [
+        { day: 'day1', kind: 'good', listId: 'list-day1-good', countId: 'count-day1-good' },
+        { day: 'day1', kind: 'bad',  listId: 'list-day1-bad',  countId: 'count-day1-bad' },
+        { day: 'day2', kind: 'good', listId: 'list-day2-good', countId: 'count-day2-good' },
+        { day: 'day2', kind: 'bad',  listId: 'list-day2-bad',  countId: 'count-day2-bad' }
+      ];
+
+      targets.forEach(cfg => {
+        const listEl = document.getElementById(cfg.listId);
+        const countEl = document.getElementById(cfg.countId);
+        listEl.innerHTML = '';
+
+        if (isError) {
+          countEl.textContent = '-';
+          listEl.innerHTML = `
+            <div class="empty-comments">
+              <p>⚠️ コメントを読み込めませんでした</p>
+              <button type="button" class="reload-comments-btn" onclick="fetchData()">
+                🔄 再読み込み
+              </button>
+            </div>
+          `;
+          return;
+        }
+
+        const filtered = (commentsList || []).filter(c => {
+          const cDay = (c.day || '').toLowerCase().trim();
+          const cKind = (c.kind || '').toLowerCase().trim();
+          return cDay === cfg.day && cKind === cfg.kind;
+        });
+
+        // 新しい順（id降順、または配列の逆順）
+        const sorted = [...filtered].sort((a, b) => {
+          if (a.id && b.id) return b.id - a.id;
+          return 0;
+        });
+
+        countEl.textContent = `${sorted.length}件`;
+
+        if (sorted.length === 0) {
+          listEl.innerHTML = `
+            <div class="empty-comments">
+              まだコメントはありません。<br>上のフォームから投稿してみましょう！
+            </div>
+          `;
+        } else {
+          sorted.forEach(c => {
+            const author = c.name ? escapeHtml(c.name) : '無記名スタッフ';
+            const at = c.at ? escapeHtml(c.at) : '';
+            const text = escapeHtml(c.text || '');
+
+            const card = document.createElement('div');
+            card.className = 'comment-item';
+            card.innerHTML = `
+              <div class="comment-meta">
+                <span class="comment-author">${author}</span>
+                <span class="comment-time">${at}</span>
+              </div>
+              <div class="comment-text">${text}</div>
+            `;
+            listEl.appendChild(card);
+          });
+        }
+      });
+    }
+
+    /* ==========================================================================
+       API連携（GET / POST）
+       ========================================================================== */
+
+    // 全データ取得
+    async function fetchData() {
+      const banner = document.getElementById('api-status-banner');
+      const statusText = document.getElementById('api-status-text');
+
+      // API_URL がプレースホルダのままの場合
+      if (!API_URL || API_URL === 'YOUR_API_URL') {
+        banner.classList.add('visible');
+        banner.style.background = 'rgba(234, 179, 8, 0.3)';
+        statusText.textContent = '⚡ オフライン確定データ表示中（API_URL未設定）';
+        
+        // フォールバックデータを描画
+        appData = JSON.parse(JSON.stringify(FALLBACK_DATA));
+        renderNumbers(appData.numbers);
+        renderHourlyChart(appData.hourly);
+        renderStaff(appData.staff);
+        renderComments([], true); // コメントは未接続表示
+        return;
+      }
+
+      banner.classList.add('visible');
+      banner.style.background = 'rgba(255, 255, 255, 0.25)';
+      statusText.textContent = '🔄 最新データを取得中…';
+
+      try {
+        const response = await fetch(API_URL, {
+          method: 'GET',
+          cache: 'no-store'
+        });
+
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const data = await response.json();
+
+        if (data && data.ok) {
+          appData = data;
+          renderNumbers(data.numbers || FALLBACK_DATA.numbers);
+          renderHourlyChart(data.hourly || FALLBACK_DATA.hourly);
+          renderStaff(data.staff || FALLBACK_DATA.staff);
+          renderComments(data.comments || []);
+          commentsLoaded = true;
+
+          statusText.textContent = '✅ 最新データ連携中';
+          setTimeout(() => {
+            banner.classList.remove('visible');
+          }, 3500);
+        } else {
+          throw new Error(data.error || 'API returned ok: false');
+        }
+      } catch (err) {
+        console.warn('API取得失敗。フォールバックデータを使用します:', err);
+        statusText.textContent = '⚠️ API接続失敗（確定データを表示中）';
+        banner.style.background = 'rgba(239, 68, 68, 0.35)';
+
+        // フォールバック表示
+        appData = JSON.parse(JSON.stringify(FALLBACK_DATA));
+        renderNumbers(appData.numbers);
+        renderHourlyChart(appData.hourly);
+        renderStaff(appData.staff);
+        renderComments([], true);
+      }
+    }
+
+    // コメント投稿ハンドラ
+    async function handleCommentSubmit(event, day, kind) {
+      event.preventDefault();
+      const form = event.target;
+      const nameInput = form.elements['name'];
+      const textInput = form.elements['text'];
+      const submitBtn = document.getElementById(`btn-${day}-${kind}`);
+      const errorDiv = document.getElementById(`error-${day}-${kind}`);
+
+      const name = nameInput.value.trim();
+      const text = textInput.value.trim();
+
+      // エラー初期化
+      errorDiv.style.display = 'none';
+      errorDiv.textContent = '';
+
+      if (!text) {
+        errorDiv.textContent = 'コメント本文を入力してください。';
+        errorDiv.style.display = 'block';
+        return;
+      }
+
+      // API URL未設定チェック
+      if (!API_URL || API_URL === 'YOUR_API_URL') {
+        errorDiv.textContent = 'API URLが設定されていません。HTML冒頭の API_URL に Apps Script のウェブアプリURLを設定してください。';
+        errorDiv.style.display = 'block';
+        return;
+      }
+
+      // ボタン二重送信防止
+      submitBtn.disabled = true;
+      const originalBtnText = submitBtn.innerHTML;
+      submitBtn.innerHTML = '<span>送信中…</span>';
+
+      try {
+        const payload = { day, kind, name, text };
+
+        // ※ CORSのプリフライトを避けるため Content-Type は必ず text/plain
+        const response = await fetch(API_URL, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'text/plain'
+          },
+          body: JSON.stringify(payload)
+        });
+
+        if (!response.ok) {
+          throw new Error(`送信に失敗しました (HTTP ${response.status})`);
+        }
+
+        const resData = await response.json();
+
+        if (resData && resData.ok) {
+          // 投稿成功
+          showToast('🎉 コメントを投稿しました！');
+          
+          // 本文を空にする（名前は再利用のため残しても親切だが、指定に従い本文をクリア）
+          textInput.value = '';
+
+          // 最新コメント一覧で更新
+          if (Array.isArray(resData.comments)) {
+            appData.comments = resData.comments;
+            renderComments(appData.comments);
+          } else {
+            // 一覧が返らなかった場合は再フェッチ
+            await fetchData();
+          }
+        } else {
+          throw new Error(resData.error || '投稿処理に失敗しました。');
+        }
+      } catch (err) {
+        console.error('Comment submit error:', err);
+        // 失敗時は本文は消さずエラーを表示
+        errorDiv.textContent = `投稿失敗: ${err.message || '通信エラーが発生しました。もう一度お試しください。'}`;
+        errorDiv.style.display = 'block';
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = originalBtnText;
+      }
+    }
+
+    /* ==========================================================================
+       初期化
+       ========================================================================== */
+    window.addEventListener('DOMContentLoaded', () => {
+      // スプレッドシートリンクの設定
+      const sheetLinkEl = document.getElementById('sheet-link');
+      if (SHEET_URL && SHEET_URL !== 'YOUR_SHEET_URL') {
+        sheetLinkEl.href = SHEET_URL;
+      } else {
+        sheetLinkEl.href = 'https://docs.google.com/spreadsheets/d/1i6xjUelHjx4OlTuWkj2XCNWXObsN9mY61GgQM5nZLSI/edit';
+      }
+
+      // 初回データ読み込み
+      fetchData();
+    });
+  </script>
+</body>
+</html>
